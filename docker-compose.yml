@@ -1,0 +1,25 @@
+services:
+  station-name-check:
+    container_name: station-name-check
+    image: station-name-check
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${API_PORT}:8000"
+    networks:
+      - station-name-network
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: 10m
+    volumes:
+      - ./database_files:/src/database_files:rw
+    restart: on-failure:3
+
+networks:
+  station-name-network:
+    name: station_name_network
