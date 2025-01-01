@@ -3,7 +3,11 @@ from fastapi.security import HTTPBasic
 from typing import Annotated
 
 from config import version as api_version
-from database import insert_database_alias, update_database_alias, delete_database_alias
+from database.query_database import (
+    delete_database_alias,
+    insert_database_alias,
+    update_database_alias,
+)
 from schemas import station_alias_dump, get_all_aliases
 from security import check_credentials
 

@@ -2,34 +2,31 @@ import sqlite3
 from loguru import logger
 from typing import Tuple
 
+from database import database_file
 
-database_file: str = "database_files/database.sqlite3"
 
-
-def check_alias_table(db_file: str = database_file):
-    """Checks if the alias table exists or creates a new one."""
-
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS station_alias(
-        pool_code INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        alias TEXT NOT NULL,
-        PRIMARY KEY (pool_code, name)
-        );
+def get_modified_rows_count(
+    table_name: str, db_file: str = database_file
+) -> int | None:
     """
-
+    Returns the count of modified rows in the specified table. Used to find out
+    if there are any modified rows in the database, to determine if a backup
+    needs to be taken. In case of error, returns None to be handled by caller.
+    """
+    query = f"SELECT COUNT(is_modified) FROM {table_name} WHERE is_modified = 1;"
     try:
         with sqlite3.connect(db_file) as conn:
-            conn.execute(create_table_query)
+            return conn.execute(query).fetchone()[0]
     except Exception as e:
-        logger.warning(f"Exception during table station_alias check: {e}")
+        logger.error(f"Exception during get_modified_rows_count: {e}")
+        return None
 
 
 def get_all_database_aliases(
     db_file: str = database_file,
 ) -> list[Tuple[int, str, str]]:
     """Returns all aliases in the database."""
-    query = "SELECT * FROM station_alias"
+    query = "SELECT pool_code, name, alias FROM station_alias"
     try:
         with sqlite3.connect(db_file) as conn:
             return conn.execute(query).fetchall()

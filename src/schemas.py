@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-from database import get_all_database_aliases
+from database.query_database import get_all_database_aliases
 
 
 class StationAlias(BaseModel):
